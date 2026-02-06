@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — BASIC</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#f2eadb;
+  --paper:#faf7f2;
+  --primary:#4a3326;
+  --muted:#8a7a6d;
+  --line:#e6dccb;
+}
+
+body{
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  color:var(--primary);
+}
+
+header{
+  text-align:center;
+  padding:100px 20px 70px;
+}
+
+.logo{height:320px}
+
+main{
+  max-width:720px;
+  margin:0 auto 140px;
+  padding:0 28px;
+}
+
+h1,h2{
+  font-family:'Playfair Display',serif;
+  font-weight:400;
+}
+
+h1{
+  font-size:2.6rem;
+  margin-bottom:64px;
+}
+
+h2{
+  font-size:1.3rem;
+  margin-bottom:32px;
+}
+
+.section{margin-bottom:80px}
+
+label{
+  font-size:.65rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:10px;
+  display:block;
+}
+
+input{
+  width:100%;
+  padding:16px 14px;
+  border:none;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  outline:none;
+  font-size:.95rem;
+  margin-bottom:28px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+}
+
+button{
+  width:100%;
+  margin-top:40px;
+  padding:22px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  font-size:.7rem;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+button:hover{opacity:.92}
+
+@media(max-width:900px){
+  header{padding:80px 20px}
+  .logo{height:150px}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logoLCBasic.png" class="logo">
+</header>
+
+<main>
+
+<h1><strong>Seus dados</strong></h1>
+
+<div class="section">
+  <h2>Contato</h2>
+
+  <label>Nome completo</label>
+  <input id="nome">
+
+  <label>E-mail</label>
+  <input id="email">
+
+  <label>Celular (WhatsApp)</label>
+  <input id="telefone">
+</div>
+
+<div class="section">
+  <h2>Entrega</h2>
+
+  <label>Endereço</label>
+  <input id="endereco">
+
+  <div class="grid">
+    <div>
+      <label>Número</label>
+      <input id="numero">
+    </div>
+    <div>
+      <label>Complemento (opcional)</label>
+      <input id="complemento">
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Nota fiscal</h2>
+
+  <label>CPF</label>
+  <input id="cpf">
+</div>
+
+<button onclick="continuar()">Continuar para pagamento</button>
+
+</main>
+
+<script>
+function continuar(){
+  const dados = {
+    nome: nome.value,
+    email: email.value,
+    telefone: telefone.value,
+    endereco: endereco.value,
+    numero: numero.value,
+    complemento: complemento.value,
+    cpf: cpf.value
+  };
+
+  for(const c in dados){
+    if(!dados[c] && c !== "complemento"){
+      alert("Preencha todos os campos obrigatórios");
+      return;
+    }
+  }
+
+  localStorage.setItem("checkout_dados", JSON.stringify(dados));
+  window.location.href = "pagamento.html";
+}
+</script>
+
+</body>
+</html>

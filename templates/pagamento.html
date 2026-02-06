@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagamento — BASIC</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#f2eadb;
+  --paper:#faf7f2;
+  --primary:#4a3326;
+  --muted:#8a7a6d;
+  --line:#e6dccb;
+}
+
+body{
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  color:var(--primary);
+}
+
+header{
+  text-align:center;
+  padding:80px 20px;
+}
+
+.logo{height:180px}
+
+main{
+  max-width:640px;
+  margin:0 auto 120px;
+  padding:0 28px;
+}
+
+h1{
+  font-family:'Playfair Display',serif;
+  font-weight:400;
+  font-size:2.2rem;
+  margin-bottom:40px;
+  text-align:center;
+}
+
+.method{
+  border:1px solid var(--line);
+  padding:28px 30px;
+  margin-bottom:26px;
+  cursor:pointer;
+}
+
+.method.active{
+  border-color:var(--primary);
+  background:rgba(74,51,38,.04);
+}
+
+.method-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.method-title{
+  font-size:.75rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+
+.method-sub{
+  font-size:.7rem;
+  color:var(--muted);
+  margin-top:10px;
+}
+
+.method-content{
+  display:none;
+  margin-top:30px;
+}
+
+.method.active .method-content{
+  display:block;
+}
+
+label{
+  font-size:.65rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:8px;
+  display:block;
+}
+
+input, select{
+  width:100%;
+  padding:14px 12px;
+  margin-bottom:22px;
+  border:none;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  font-size:.9rem;
+  outline:none;
+}
+
+button{
+  width:100%;
+  margin-top:40px;
+  padding:22px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  font-size:.7rem;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+#pixArea{
+  display:none;
+  margin-top:40px;
+  text-align:center;
+  background:var(--paper);
+  padding:30px;
+}
+
+#pixArea img{
+  max-width:260px;
+  margin:20px 0;
+}
+
+#pixCode{
+  width:100%;
+  padding:12px;
+}
+</style>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+
+</head>
+
+<script>
+  const mp = new MercadoPago("SUA_PUBLIC_KEY_AQUI");
+  </script>
+  
+
+<body>
+
+<header>
+  <img src="logoLCBasic.png" class="logo" alt="BASIC">
+</header>
+
+<main>
+
+<h1>Pagamento</h1>
+
+
+<!-- PIX -->
+<div class="method active">
+  <div class="method-header">
+    <span class="method-title">PIX</span>
+    <img src="https://logospng.org/download/pix/logo-pix-icone-512.png" height="22">
+  </div>
+
+  <div class="method-sub">Pagamento instantâneo aprovado na hora</div>
+
+  <div class="method-content">
+    <p>Após confirmar, o QR Code será exibido.</p>
+  </div>
+</div>
+
+<!-- CARTÃO -->
+<div class="method">
+  <div class="method-header">
+    <span class="method-title">Cartão</span>
+    <div>
+      <i class="fa-brands fa-cc-visa"></i>
+      <i class="fa-brands fa-cc-mastercard"></i>
+    </div>
+  </div>
+
+  <div class="method-sub">Crédito ou débito</div>
+
+  <div class="method-content">
+
+    <label>Nome impresso no cartão</label>
+    <input id="cardName" placeholder="Nome completo">
+
+    <label>Número do cartão</label>
+    <input id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <label>Validade (MM/AA)</label>
+        <input id="cardExpiry" placeholder="MM/AA" maxlength="5">
+      </div>
+      <div>
+        <label>Código de segurança (CVV)</label>
+        <input id="cardCvv" placeholder="123" maxlength="4">
+      </div>
+    </div>
+
+    <label>Parcelas</label>
+    <select id="installments">
+      <option value="1">1x de R$ 199,90</option>
+      <option value="2">2x de R$ 99,95</option>
+      <option value="3">3x de R$ 66,63</option>
+    </select>
+
+  </div>
+</div>
+
+<button onclick="finalizarPagamento()">Finalizar pagamento</button>
+
+<!-- PIX RESULTADO -->
+<div id="pixArea">
+  <h2>Escaneie o QR Code</h2>
+  <img id="qrPix">
+  <p>Código Pix (Copia e Cola)</p>
+  <input id="pixCode" readonly>
+  <br><br>
+  <button onclick="copiarPix()">Copiar código PIX</button>
+</div>
+
+</main>
+
+<script>
+
+async function pagarComCartao() {
+
+const [mes, ano] = cardExpiry.value.split("/");
+
+const cardData = {
+  cardNumber: cardNumber.value.replace(/\s/g, ""),
+  cardholderName: cardName.value,
+  cardExpirationMonth: mes,
+  cardExpirationYear: "20" + ano,
+  securityCode: cardCvv.value,
+  installments: installments.value,
+  identificationType: "CPF",
+  identificationNumber: "12345678909"
+};
+
+try {
+ 
+  const tokenResponse = await mp.createCardToken(cardData);
+
+  if (tokenResponse.error) {
+    alert("Erro ao validar cartão");
+    console.error(tokenResponse);
+    return;
+  }
+
+
+  const res = await fetch("http://localhost:3333/pagar/cartao", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: tokenResponse.id,
+      parcelas: installments.value,
+      valor: 199.90
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.status === "approved") {
+    window.location.href = "confirmado.html";
+  } else {
+    alert("Pagamento recusado");
+  }
+
+} catch (err) {
+  console.error(err);
+  alert("Erro no pagamento");
+}
+}
+
+const methods = document.querySelectorAll(".method");
+
+methods.forEach(m=>{
+  m.addEventListener("click",()=>{
+    methods.forEach(x=>x.classList.remove("active"));
+    m.classList.add("active");
+  });
+});
+
+function finalizarPagamento(){
+  const metodo = document
+    .querySelector(".method.active .method-title")
+    .innerText;
+
+  metodo === "PIX" ? gerarPix() : pagarComCartao();
+}
+
+
+async function gerarPix(){
+  try{
+    const res = await fetch("/pagar/pix",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ valor:199.90 })
+    });
+
+    if(!res.ok) throw new Error();
+
+    const data = await res.json();
+
+    pixArea.style.display="block";
+    qrPix.src = data.qrCodeBase64;
+    pixCode.value = data.copiaCola;
+
+  }catch{
+    alert("Erro ao gerar PIX");
+  }
+}
+
+
+function pagarComCartao(){
+  if(
+    !cardName.value ||
+    !cardNumber.value ||
+    !cardExpiry.value ||
+    !cardCvv.value
+  ){
+    alert("Preencha todos os dados do cartão");
+    return;
+  }
+
+  setTimeout(()=>{
+    alert("Pagamento aprovado ");
+    window.location.href="confirmado.html";
+  },1000);
+}
+
+
+function copiarPix(){
+  pixCode.select();
+  document.execCommand("copy");
+  alert("Código PIX copiado");
+}
+</script>
+
+</body>
+</html>

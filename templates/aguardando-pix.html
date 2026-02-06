@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aguardando pagamento — PIX</title>
+
+<style>
+body{
+  background:#f2eadb;
+  font-family:Arial, sans-serif;
+  text-align:center;
+  padding:80px 20px;
+}
+.box{
+  max-width:420px;
+  margin:auto;
+  background:#fff;
+  padding:40px;
+}
+h1{font-size:1.4rem;margin-bottom:20px}
+p{font-size:.9rem;color:#555}
+.loading{
+  margin-top:30px;
+  font-size:.8rem;
+  letter-spacing:2px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h1>Aguardando pagamento PIX</h1>
+  <p>Assim que o pagamento for confirmado, você será redirecionado automaticamente.</p>
+  <div class="loading">VERIFICANDO PAGAMENTO…</div>
+</div>
+<div id="pixArea"></div>
+
+<script>
+  const pixId = localStorage.getItem("pix_id");
+  
+  async function verificarPix(){
+    const res = await fetch(`http://localhost:3333`);
+    const data = await res.json();
+  
+    if(data.status === "approved"){
+      localStorage.removeItem("pix_id");
+      window.location.href = "sucesso.html";
+    }
+  }
+  
+  setInterval(verificarPix, 5000);
+  </script>
+  
+  </body>
+</html>
